@@ -3,7 +3,6 @@ package ru.dmbel.xsd2dsl;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
-import com.squareup.javapoet.ClassName;
 import ru.dmbel.jcomander.FileExistsValidator;
 
 import java.io.File;
@@ -50,7 +49,7 @@ public class Main {
     private void run() {
         try {
             // XSD items name to java class/methods/parameters name converter
-            NameConverter nameConverter = new NameConverter();
+            CamelNameConverter nameConverter = new CamelNameConverter();
             // Javapoet based code builder
             CodeBuilder codeBuilder = new CodeBuilder(packageName, nameConverter);
             // XSD file parser
