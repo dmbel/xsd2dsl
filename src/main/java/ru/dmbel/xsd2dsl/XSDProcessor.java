@@ -23,7 +23,7 @@ public class XSDProcessor {
         this.codeBuilder = codeBuilder;
     }
 
-    private Document createDoc(){
+    private Document createDoc() {
         Document doc = null;
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -40,22 +40,20 @@ public class XSDProcessor {
             Document doc = createDoc();
             XPathFactory xPathfactory = XPathFactory.newInstance();
             XPath xpath = xPathfactory.newXPath();
-            // element enumeration
-            XPathExpression xslElementExpr = xpath.compile("//schema/element");
-            NodeList nodeList = (NodeList) xslElementExpr.evaluate(doc, XPathConstants.NODESET);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                String elemName = node.getAttributes().getNamedItem("name").getNodeValue();
-                codeBuilder.addElement(elemName);
+            String[][] rootNodes = {
+                    {"//schema/element", "element"},
+                    {"//schema/complexType", "complexType"}
+            };
+            for (int k = 0; k < rootNodes.length; k++) {
+                XPathExpression xslElementExpr = xpath.compile(rootNodes[k][0]);
+                NodeList nodeList = (NodeList) xslElementExpr.evaluate(doc, XPathConstants.NODESET);
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Node node = nodeList.item(i);
+                    String elemName = node.getAttributes().getNamedItem("name").getNodeValue();
+                    codeBuilder.pushNode(rootNodes[k][1], elemName);
+                }
             }
-            // element enumeration
-            XPathExpression xslComplexTypeExpr = xpath.compile("//schema/complexType");
-            NodeList nodeList = (NodeList) xslElementExpr.evaluate(doc, XPathConstants.NODESET);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                String elemName = node.getAttributes().getNamedItem("name").getNodeValue();
-                codeBuilder.addElement(elemName);
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

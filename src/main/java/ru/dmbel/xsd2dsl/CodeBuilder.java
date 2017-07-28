@@ -14,4 +14,7 @@ public class CodeBuilder {
 
     public void addElement(String elemName) {
     }
+
+    public void pushNode(String type, String name) {
+    }
 }
