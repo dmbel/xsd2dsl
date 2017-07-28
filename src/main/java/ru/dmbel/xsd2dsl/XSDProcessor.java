@@ -17,6 +17,8 @@ public class XSDProcessor {
     private InputStream xsdInputStream;
 
     private CodeBuilder codeBuilder;
+    private Document doc;
+    private XPath xpath;
 
     public XSDProcessor(InputStream xsdInputStream, CodeBuilder codeBuilder) {
         this.xsdInputStream = xsdInputStream;
@@ -37,25 +39,27 @@ public class XSDProcessor {
 
     public void process() {
         try {
-            Document doc = createDoc();
+            doc = createDoc();
             XPathFactory xPathfactory = XPathFactory.newInstance();
-            XPath xpath = xPathfactory.newXPath();
-            String[][] rootNodes = {
-                    {"//schema/element", "element"},
-                    {"//schema/complexType", "complexType"}
-            };
-            for (int k = 0; k < rootNodes.length; k++) {
-                XPathExpression xslElementExpr = xpath.compile(rootNodes[k][0]);
-                NodeList nodeList = (NodeList) xslElementExpr.evaluate(doc, XPathConstants.NODESET);
-                for (int i = 0; i < nodeList.getLength(); i++) {
-                    Node node = nodeList.item(i);
-                    String elemName = node.getAttributes().getNamedItem("name").getNodeValue();
-                    codeBuilder.pushNode(rootNodes[k][1], elemName);
-                }
-            }
+            xpath = xPathfactory.newXPath();
 
+            // Первый проход - сообщить codeBuilder о корневых элементах XSD схемы
+            pushRootNodes(XSDType.Element,"//schema/element");
+            pushRootNodes(XSDType.ComplexType,"//schema/complexType");
+            pushRootNodes(XSDType.Group,"//schema/group");
+            pushRootNodes(XSDType.AttributeGroup,"//schema/attributeGroup");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void pushRootNodes(XSDType xsdType, String expr) throws XPathExpressionException {
+        XPathExpression xslElementExpr = xpath.compile(expr);
+        NodeList nodeList = (NodeList) xslElementExpr.evaluate(doc, XPathConstants.NODESET);
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            String elemName = node.getAttributes().getNamedItem("name").getNodeValue();
+            codeBuilder.pushNode(xsdType, elemName);
         }
     }
 }

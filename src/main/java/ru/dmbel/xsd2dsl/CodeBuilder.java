@@ -5,9 +5,9 @@ package ru.dmbel.xsd2dsl;
  */
 public class CodeBuilder {
     private String packageName;
-    private NameConverter nameConverter;
+    private CamelNameConverter nameConverter;
 
-    public CodeBuilder(String packageName, NameConverter nameConverter) {
+    public CodeBuilder(String packageName, CamelNameConverter nameConverter) {
         this.packageName = packageName;
         this.nameConverter = nameConverter;
     }
@@ -15,6 +15,6 @@ public class CodeBuilder {
     public void addElement(String elemName) {
     }
 
-    public void pushNode(String type, String name) {
+    public void pushNode(XSDType type, String name) {
     }
 }
